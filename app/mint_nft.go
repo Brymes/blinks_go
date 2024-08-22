@@ -16,9 +16,11 @@ import (
 	"log"
 )
 
-func mintNFT(metadata MintNFTParams, feePayer types.Account) ActionPostResponse {
+func mintNFT(metadata MintNFTParams, feePayer types.Account) (transaction, message string) {
 	// https://github.com/rayzub/solana-go-sdk/blob/v1.18.68/docs/_examples/nft/mint-a-nft-with-master-edition-v2/main.go
 	// https://github.com/Keleigh123/solana-nft-minting/blob/master/mintNFT/fullCodeToMint.go
+
+	message = fmt.Sprintf("Mint NFT %s", metadata.Name)
 
 	c := client.NewClient(rpc.DevnetRPCEndpoint)
 	log.Println(metadata)
@@ -141,11 +143,6 @@ func mintNFT(metadata MintNFTParams, feePayer types.Account) ActionPostResponse 
 	//}
 	//
 	//fmt.Println("txid:", sig)
-
-	return ActionPostResponse{Fields: struct {
-		Transaction string `json:"transaction"`
-		Message     string `json:"message"`
-	}{Transaction: base64.StdEncoding.EncodeToString(serialized), Message: fmt.Sprintf("Mint NFT %s", metadata.Name)},
-	}
-
+	transaction = base64.StdEncoding.EncodeToString(serialized)
+	return
 }

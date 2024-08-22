@@ -11,7 +11,7 @@ const (
 	RPC_URL = ""
 )
 
-func ActionsRulesHAndler(c *gin.Context) {
+func ActionsRulesHandler(c *gin.Context) {
 	payload := gin.H{
 		"rules": []gin.H{
 			{
@@ -24,7 +24,7 @@ func ActionsRulesHAndler(c *gin.Context) {
 			},
 		},
 	}
-	
+
 	c.JSON(http.StatusOK, payload)
 }
 
@@ -57,25 +57,27 @@ func PostHandler(c *gin.Context) {
 	var (
 		qPayload MintNFTParams
 		request  ActionPostRequest
+		response ActionPostResponse
 	)
 
 	if err := c.ShouldBindQuery(&qPayload); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Query Params"})
+		c.JSON(http.StatusBadRequest, ActionError{Message: "Invalid Query Params"})
 		return
 	}
 
 	if err := c.ShouldBindJSON(&request); err != nil {
 		log.Println(err)
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
+		c.JSON(http.StatusBadRequest, ActionError{Message: "Invalid request"})
 		return
 	}
 
 	account, err := types.AccountFromBase58(request.Account)
 	if err != nil {
 		log.Println(err)
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request; Error validating account"})
+		c.JSON(http.StatusBadRequest, ActionError{Message: "Invalid request; Error validating account"})
 		return
 	}
+	response.Fields.Transaction, response.Fields.Message = mintNFT(qPayload, account)
 
-	c.JSON(http.StatusOK, mintNFT(qPayload, account))
+	c.JSON(http.StatusOK, response)
 }

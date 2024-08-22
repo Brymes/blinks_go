@@ -27,10 +27,15 @@ type ActionPostRequest struct {
 }
 
 type ActionPostResponse struct {
-	Fields struct {
-		Transaction string `json:"transaction"`
-		Message     string `json:"message"`
-	} `json:"fields"`
+	Fields ActionPostResponseFields `json:"fields"`
+}
+type ActionPostResponseFields struct {
+	Transaction string `json:"transaction"`
+	Message     string `json:"message"`
+}
+
+type ActionError struct {
+	Message string `json:"message"`
 }
 
 type MintNFTParams struct {

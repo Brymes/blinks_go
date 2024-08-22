@@ -2,21 +2,39 @@ package main
 
 import (
 	"StickyLabsBlinks/app"
+	"fmt"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"log"
+	"os"
 )
 
 func main() {
-	router := gin.Default()
+	var (
+		corsConfig = cors.DefaultConfig()
+		router     = gin.Default()
+		port       = os.Getenv("PORT")
+	)
 
-	//TODO action.json
-	router.GET("/actions.json", app.ActionsRulesHAndler)
+	corsConfig.AllowAllOrigins = true
+	corsConfig.AddAllowHeaders([]string{"Content-Length", "Content-Type", "Access-Control-Allow-Origin"}...)
+	corsConfig.AddAllowMethods([]string{"GET", "POST", "OPTIONS"}...)
+
+	router.Use(cors.New(corsConfig))
+
+	router.GET("/actions.json", app.ActionsRulesHandler)
 	router.GET("/api/actions/mint_nft", app.GetActionsHandler)
 	router.OPTIONS("/api/actions/mint_nft", app.OptionsHandler)
 	router.POST("/api/actions/mint_nft", app.PostHandler)
 
 	log.Println("StickyLabs Blink Active 🚀")
-	err := router.Run(":8080")
+
+	if port == "" {
+		port = "8081"
+	}
+
+	log.Println("Server is running")
+	err := router.Run(fmt.Sprintf(":%v", port))
 	if err != nil {
 		log.Fatal(err)
 		return
